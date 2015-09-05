@@ -1,0 +1,19 @@
+{
+  "name": "atom-codepen-editor",
+  "main": "./lib/atom-codepen-editor",
+  "version": "0.0.0",
+  "description": "A short description of your package",
+  "keywords": [],
+  "activationCommands": {
+    "atom-workspace": "atom-codepen-editor:toggle"
+  },
+  "repository": "https://github.com/atom/atom-codepen-editor",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {
+    "open": "0.0.5",
+    "ws": "^0.8.0"
+  }
+}
