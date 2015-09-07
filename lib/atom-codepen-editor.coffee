@@ -2,6 +2,8 @@ AtomCodepenEditorView = require './atom-codepen-editor-view'
 {CompositeDisposable} = require 'atom'
 open = require "open"
 ws = require "ws"
+tmp = require "tmp"
+fs = require "fs"
 
 WebSocketServer = ws.Server
 
@@ -49,17 +51,32 @@ module.exports = AtomCodepenEditor =
     setTimeout (=> @modalPanel.hide() ), 1500
 
   newEditor: ->
-      open("https://codepen.io/pen", "Google Chrome")
+      #open("https://codepen.io/pen", "Google Chrome")
+      tmp.dir {mode: '0777', prefix: 'AtomCodePen_'}, (err, path, cleanupCallback) ->
+        throw err if err
+        ["html", "css", "js"].forEach (extension) ->
+          fs.writeFileSync "/#{path}/codepen.#{extension}", ""
+
+        atom.open({
+          pathsToOpen: ["#{path}"],
+          newWindow: false
+        })
+        #console.log("dir:", path)
+        #cleanupCallback()
+
 
   currentEditorText: ->
     editor = atom.workspace.getActiveTextEditor()
     console.log editor.getText()
 
   publishChanges: ->
+    console.log(@wss, @ws)
     if @wss && @ws
-      console.log('test')
-      @ws.send("{
-        \"html\": \"<textarea></textarea>\",
-        \"css\": \"body: {background: #3c3c3c};\",
-        \"js\": \"console.log('test')\"
-        }")
+      editor = atom.workspace.getActiveTextEditor()
+      currentFileType = editor.getTitle().split(".")[1]
+      console.log("editing the #{currentFileType} file")
+      # @ws.send("{
+      #   \"html\": \"<textarea></textarea>\",
+      #   \"css\": \"body: {background: #3c3c3c};\",
+      #   \"js\": \"console.log('test')\"
+      #   }")
