@@ -51,7 +51,6 @@ module.exports = AtomCodepenEditor =
     setTimeout (=> @modalPanel.hide() ), 1500
 
   newEditor: ->
-      #open("https://codepen.io/pen", "Google Chrome")
       tmp.dir {mode: '0777', prefix: 'AtomCodePen_'}, (err, path, cleanupCallback) ->
         throw err if err
         ["html", "css", "js"].forEach (extension) ->
@@ -61,9 +60,8 @@ module.exports = AtomCodepenEditor =
           pathsToOpen: ["#{path}"],
           newWindow: false
         })
-        #console.log("dir:", path)
-        #cleanupCallback()
 
+        #open("https://codepen.io/pen", "Google Chrome")
 
   currentEditorText: ->
     editor = atom.workspace.getActiveTextEditor()
@@ -74,9 +72,7 @@ module.exports = AtomCodepenEditor =
     if @wss && @ws
       editor = atom.workspace.getActiveTextEditor()
       currentFileType = editor.getTitle().split(".")[1]
-      console.log("editing the #{currentFileType} file")
-      # @ws.send("{
-      #   \"html\": \"<textarea></textarea>\",
-      #   \"css\": \"body: {background: #3c3c3c};\",
-      #   \"js\": \"console.log('test')\"
-      #   }")
+      @ws.send(JSON.stringify({
+        "type": currentFileType,
+        "data": editor.getText()
+        }))
