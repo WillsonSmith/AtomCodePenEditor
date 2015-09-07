@@ -12,7 +12,6 @@ module.exports = AtomCodepenEditor =
   subscriptions: null
 
   activate: (state) ->
-    shell = require 'shell'
 
     @atomCodepenEditorView = new AtomCodepenEditorView(state.atomCodepenEditorViewState)
     @modalPanel = atom.workspace.addModalPanel(item: @atomCodepenEditorView.getElement(), visible: false)
@@ -22,7 +21,9 @@ module.exports = AtomCodepenEditor =
 
     # Register command that toggles this view
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-codepen-editor:toggle': => @toggle()
-    atom.commands.add 'atom-workspace', "codepen-editor:new", => @newEditor()
+    @subscriptions.add atom.commands.add 'atom-workspace', "codepen-editor:new", => @newEditor()
+    @subscriptions.add atom.commands.add 'atom-workspace', "codepen-editor:publish", => @publishChanges()
+    @subscriptions.add atom.commands.add 'atom-workspace', "codepen-editor:currentEditorText", => @currentEditorText()
 
   deactivate: ->
     @modalPanel.destroy()
@@ -33,18 +34,32 @@ module.exports = AtomCodepenEditor =
     atomCodepenEditorViewState: @atomCodepenEditorView.serialize()
 
   toggle: ->
+    if !@wss
+      @wss = new WebSocketServer({port: 8080})
+      @wss.on 'connection', (ws) =>
+        @ws = ws
+        ws.on 'message', (message) ->
+          console.log "received: #{message}"
+        ws.send('connected')
 
     if @modalPanel.isVisible()
       @modalPanel.hide()
     else
       @modalPanel.show()
+    setTimeout (=> @modalPanel.hide() ), 1500
 
   newEditor: ->
       open("https://codepen.io/pen", "Google Chrome")
 
-      if !@wss
-        @wss = new WebSocketServer({port: 8080})
-        @wss.on 'connection', (ws) ->
-          ws.on 'message', (message) ->
-            console.log "received: #{message}"
-          ws.send('connected')
+  currentEditorText: ->
+    editor = atom.workspace.getActiveTextEditor()
+    console.log editor.getText()
+
+  publishChanges: ->
+    if @wss && @ws
+      console.log('test')
+      @ws.send("{
+        \"html\": \"<textarea></textarea>\",
+        \"css\": \"body: {background: #3c3c3c};\",
+        \"js\": \"console.log('test')\"
+        }")
