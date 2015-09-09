@@ -21,9 +21,11 @@ chrome.extension.onMessage.addListener (msg, sender, sendResponse) ->
   s = document.createElement("script")
   if data
     content = data.data.replace(/[\r\n]/g, "\\n");
+    jsContent = content.replace(/[']/g, "\\'");
+
     functionToRun = "AreaEditor.htmlEditor.injectContent('#{content}')" if data.type == "html"
     functionToRun = "AreaEditor.cssEditor.injectContent('#{content}')" if data.type == "css"
-    functionToRun = "AreaEditor.jsEditor.injectContent('#{content}')" if data.type == "js"
+    functionToRun = "AreaEditor.jsEditor.injectContent('#{jsContent}')" if data.type == "js"
     s.innerHTML = "
     (function() {
         #{functionToRun}
