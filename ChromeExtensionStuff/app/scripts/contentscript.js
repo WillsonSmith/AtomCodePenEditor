@@ -30,14 +30,14 @@
   });
 
   chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
-    var content, data, functionToRun, jsContent;
+    var content, data, functionToRun;
     if (msg.action !== "connected") {
       data = JSON.parse(msg.action);
     }
     s = document.createElement("script");
     if (data) {
       content = data.data.replace(/[\r\n]/g, "\\n");
-      jsContent = content.replace(/[']/g, "\\'");
+      content = content.replace(/[']/g, "\\'");
       if (data.type === "html") {
         functionToRun = "AreaEditor.htmlEditor.injectContent('" + content + "')";
       }
@@ -45,7 +45,7 @@
         functionToRun = "AreaEditor.cssEditor.injectContent('" + content + "')";
       }
       if (data.type === "js") {
-        functionToRun = "AreaEditor.jsEditor.injectContent('" + jsContent + "')";
+        functionToRun = "AreaEditor.jsEditor.injectContent('" + content + "')";
       }
       s.innerHTML = "(function() { " + functionToRun + " })();";
       return document.body.appendChild(s);
