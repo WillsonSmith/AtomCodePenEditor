@@ -24,6 +24,7 @@ module.exports = AtomCodepenEditor =
     # Register command that toggles this view
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-codepen-editor:toggle': => @toggle()
     @subscriptions.add atom.commands.add 'atom-workspace', "codepen-editor:new", => @newEditor()
+    @subscriptions.add atom.commands.add 'atom-workspace', "codepen-editor:newWithPen", => @newEditorWithPen()
     @subscriptions.add atom.commands.add 'atom-workspace', "codepen-editor:publish", => @publishChanges()
     @subscriptions.add atom.commands.add 'atom-workspace', "codepen-editor:currentEditorText", => @currentEditorText()
 
@@ -35,6 +36,11 @@ module.exports = AtomCodepenEditor =
   serialize: ->
     atomCodepenEditorViewState: @atomCodepenEditorView.serialize()
 
+  addTextBufferObserver: (workspace, callback) ->
+    console.log('test', workspace, callback)
+    workspace.buffer.onDidSave ->
+      callback()
+
   toggle: ->
     if !@wss
       @wss = new WebSocketServer({port: 8080})
@@ -44,6 +50,12 @@ module.exports = AtomCodepenEditor =
           console.log "received: #{message}"
         ws.send('connected')
 
+    textBufferSaveEventHandler = =>
+      @publishChanges()
+
+    atom.workspace.observeTextEditors (workspace) =>
+      @addTextBufferObserver(workspace, textBufferSaveEventHandler)
+
     if @modalPanel.isVisible()
       @modalPanel.hide()
     else
@@ -51,17 +63,21 @@ module.exports = AtomCodepenEditor =
     setTimeout (=> @modalPanel.hide() ), 1500
 
   newEditor: ->
-      tmp.dir {mode: '0777', prefix: 'AtomCodePen_'}, (err, path, cleanupCallback) ->
-        throw err if err
-        ["html", "css", "js"].forEach (extension) ->
-          fs.writeFileSync "/#{path}/codepen.#{extension}", ""
 
-        atom.open({
-          pathsToOpen: ["#{path}"],
-          newWindow: false
-        })
+    tmp.dir {mode: '0777', prefix: 'AtomCodePen_'}, (err, path, cleanupCallback) ->
+      throw err if err
+      ["html", "css", "js"].forEach (extension) ->
+        fs.writeFileSync "/#{path}/codepen.#{extension}", ""
 
-        #open("https://codepen.io/pen", "Google Chrome")
+      atom.open({
+        pathsToOpen: ["#{path}"],
+        newWindow: false
+      })
+
+
+  newEditorWithPen: ->
+    @newEditor()
+    open("https://codepen.io/pen", "Google Chrome")
 
   currentEditorText: ->
     editor = atom.workspace.getActiveTextEditor()

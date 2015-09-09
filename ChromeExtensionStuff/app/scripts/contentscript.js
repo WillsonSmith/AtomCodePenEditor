@@ -13,7 +13,6 @@
     if (xhr.status !== 200) {
       return;
     }
-    console.log(xhr.responseText);
     s.innerHTML = xhr.responseText;
     return document.body.appendChild(s);
   };
@@ -26,7 +25,7 @@
 
   xhr.send();
 
-  chrome.runtime.sendMessage("hi", function(response) {
+  chrome.runtime.sendMessage("connect", function(response) {
     return console.log(response);
   });
 
@@ -35,10 +34,9 @@
     if (msg.action !== "connected") {
       data = JSON.parse(msg.action);
     }
-    console.log(data);
     s = document.createElement("script");
     if (data) {
-      content = data.data.replace(/[\r\n]/g, "");
+      content = data.data.replace(/[\r\n]/g, "\\n");
       if (data.type === "html") {
         functionToRun = "AreaEditor.htmlEditor.injectContent('" + content + "')";
       }

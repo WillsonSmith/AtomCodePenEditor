@@ -12,7 +12,6 @@
 
     AreaEditor.prototype.injectContent = function(content) {
       this.node.setValue(content);
-      console.log(this.node);
       return this;
     };
 
@@ -27,7 +26,6 @@
   jsEditor = new AreaEditor(editors[2]);
 
   areaEditObject = {
-    AreaEditor: AreaEditor,
     htmlEditor: htmlEditor,
     cssEditor: cssEditor,
     jsEditor: jsEditor
