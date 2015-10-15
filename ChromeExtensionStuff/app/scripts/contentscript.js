@@ -29,6 +29,7 @@ chrome.extension.onMessage.addListener(function (msg, sender, sendResponse) {
   if (msg.action !== "connected") {
     data = JSON.parse(msg.action);
   }
+  console.log(msg);
   var newScriptTag = document.createElement("script");
   if (data) {
     console.log(data);
@@ -45,7 +46,7 @@ chrome.extension.onMessage.addListener(function (msg, sender, sendResponse) {
     if (data.type === "js") {
       functionToRun = "AreaEditor.jsEditor.injectContent('" + content + "')";
     }
-    newScriptTag.innerHTML = "(function() {" + functionToRun + "})";
+    newScriptTag.innerHTML = "(function() {" + functionToRun + "})();";
     body.appendChild(newScriptTag);
   }
 });

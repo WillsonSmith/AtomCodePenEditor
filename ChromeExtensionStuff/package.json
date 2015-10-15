@@ -1,13 +1,15 @@
 {
   "name": "codepen-atom-editor",
   "watch": {
-    "build": "app/scripts/AreaEditor.es6",
-    "build-extras": "app/scripts/contentscript.es6"
+    "build-AreaEditor": "app/scripts/AreaEditor.es6",
+    "build-contentscript": "app/scripts/contentscript.es6",
+    "build-background": "app/scripts/background.es6"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "./node_modules/.bin/browserify -t [babelify] app/scripts/AreaEditor.es6 > app/scripts/AreaEditor.js",
-    "build-extras": "./node_modules/.bin/browserify -t [babelify] app/scripts/contentscript.es6 > app/scripts/contentscript.js",
+    "build-AreaEditor": "./node_modules/.bin/browserify -t [babelify] app/scripts/AreaEditor.es6 > app/scripts/AreaEditor.js",
+    "build-contentscript": "./node_modules/.bin/browserify -t [babelify] app/scripts/contentscript.es6 > app/scripts/contentscript.js",
+    "build-background": "./node_modules/.bin/browserify -t [babelify] app/scripts/background.es6 > app/scripts/background.js",
     "watch": "npm-watch"
   },
   "version": "0.0.0",

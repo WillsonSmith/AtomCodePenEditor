@@ -42,7 +42,7 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     if (data.type === "js") {
       functionToRun = `AreaEditor.jsEditor.injectContent('${content}')`;
     }
-    newScriptTag.innerHTML = `(function() {${functionToRun}})`;
+    newScriptTag.innerHTML = `(function() {${functionToRun}})();`;
     body.appendChild(newScriptTag);
   }
 });
